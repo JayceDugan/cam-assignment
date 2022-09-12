@@ -118,14 +118,10 @@ else:
 #  section.
 #
 
-
 # variables
 cell_Size = 80 # global
 
-
 def competitor_b_exhausted(x_cord, y_cord): # cat_exhausted
-
-
     # border
     fillcolor("DarkSlateBlue")
     begin_fill()
@@ -328,9 +324,7 @@ def competitor_b_energetic(x_cord, y_cord): # cat_energetic
  
 #-------------------------------
 
-
 def competitor_a_exhausted(x_cord, y_cord): # mouse_exhausted
-
     # border
     fillcolor("cadetBlue")
     begin_fill()
@@ -338,8 +332,7 @@ def competitor_a_exhausted(x_cord, y_cord): # mouse_exhausted
     end_fill()
 
     # goto origin for all body parts
-    # adjustments =  position, size
-
+    # adjustments = position, size
 
     # mouse_head
     penup()
@@ -427,7 +420,6 @@ def competitor_a_exhausted(x_cord, y_cord): # mouse_exhausted
 #-------------------------------
 
 def competitor_a_energetic(x_cord, y_cord): # mouse_energetic
-
     # border
     fillcolor("green")
     begin_fill()
@@ -584,12 +576,13 @@ def visualise_data(steps, labelling):
 
     title("The Cat and Mouse")
     write_text()
+
     competitor_a_energetic(-330,295)
     competitor_a_exhausted(310,295)
+
     competitor_b_energetic(-345,-380)
     competitor_b_exhausted(315,-380)
     #competitor_b_exhausted(0,0)
-
 
     #competitor_a_energetic(-640,80)
     #competitor_a_energetic(-640,-160)
@@ -599,9 +592,8 @@ def visualise_data(steps, labelling):
     ### 1B WORKINGS
     # check step > competitor > energy > direction > execute step
     
-
     # VARIABLES
-    competitor_a_energy = 0 # energy updated based on dataset (first list)
+    competitor_a_energy = 0
     competitor_b_energy = 0
 
     # stopping draw function when exhausted
@@ -615,81 +607,100 @@ def visualise_data(steps, labelling):
     # draw where; [0] = x, [1] = y
     competitor_a_energetic(competitor_a_pos[0], competitor_a_pos[1])
     competitor_b_energetic(competitor_b_pos[0], competitor_b_pos[1])
-    
-    ### FIRST LIST [[0, 15, 10] ...]
-    for step in steps:
-        if step[0] == 0: # refs 0 (step-1)
-            competitor_a_energy = step[1] # refs 15 (step-2)
-            competitor_b_energy = step[2] # refs 10 (step-3)
-            
-        ### SECOND LIST [step, competitor, movement]
+
+#     [[0, 9, 13],
+#     [1, 'Competitor A', 'Forward'],
+#     [2, 'Competitor B', 'Lane down'],
+#     [3, 'Competitor A', 'Forward'],
+#     [4, 'Competitor A', 'Forward'],
+#     [5, 'Competitor A', 'Forward'],[[0, 9, 13],
+#      [1, 'Competitor A', 'Forward'],
+#      [2, 'Competitor B', 'Lane down'],
+#      [3, 'Competitor A', 'Forward'],
+#      [4, 'Competitor A', 'Forward'],
+#      [5, 'Competitor A', 'Forward'],
+    initial_energy_configuration = step[0]
+    competitors_movements_list = step[1]
+
+    if (initial_energy_configuration[0] == 0)
+        competitor_a_energy = initial_energy_configuration[1]
+        competitor_b_energy = initial_energy_configuration[2]
+
+    for step in competitors_movements_list:
+        # Base Variables
+        step_number = step[0]
+        competitor = step[1]
+        movement_action = step[2]
+        is_competitor_a = competitor == 'Competitor A'
+
+        # Competitor Variables
+        competitor_position = competitor_a_pos if is_competitor_a else competitor_b_pos
+        competitor_energy = competitor_a_energy if is_competitor_a else competitor_b_energy
+
+        # Energy
+        is_energetic = energy > 0
+
+        # Axis Position
+        current_x_axis_position = competitor_position[0]
+        current_y_axis_position = competitor_position[1]
+
+        # Movement Directions
+        is_moving_up = movement_action == 'Lane up'
+        is_moving_forward = movement_action == 'Forward'
+        is_moving_down = not is_moving_up and not is_moving_forward
+
+        # Movement Functions
+        energetic_movement_function = competitor_a_energetic if is_competitor_a else competitor_b_energetic
+        exhausted_movement_function = competitor_a_exhausted if is_competitor_a else competitor_b_exhausted
+        move = energetic_movement_function if is_energetic else exhausted_movement_function
+
+        # Boundaries
+        at_top_border = current_y_axis_position >= 240
+        at_right_border = current_x_axis_position >= 640
+        at_left_border = current_x_axis_position <- 0
+        at_bottom_border = current_y_axis_position <- 240
+
+        # Let's make the mammals move
+
+        new_x_axis_position = current_x_axis_position
+        new_y_axis_position = current_y_axis_position
+
+        # Potential next squares
+        one_hop_right = current_x_axis_position + cell_Size
+        one_hop_left = current_x_axis_position - cell_Size
+        one_hop_down = current_y_axis_position - cell_Size
+        one_hop_up = current_y_axis_position + cell_Size
+
+        if is_moving_forward:
+            if not at_right_border: new_x_axis_position = one_hop_right
+        elif is_moving_up:
+            if not at_top_border: new_y_axis_position = one_hop_up
+        elif is_moving_down:
+            if is_at_bottom: new_y_axis_position = one_hop_up
         else:
-            step_number = step[0]
-            competitor = step[1]
-            movement_action = step[2]
+            # Mammal be movin left, what were we doing here hahahah
 
-            is_competitor_a = competitor == 'Competitor A'
-            competitor_position = competitor_a_pos if is_competitor_a else competitor_b_pos
+        move(new_x_axis_position, new_y_axis_position)
 
-            # Energy
-            energy = competitor_a_energy if is_competitor_a else competitor_b_energy
-            is_energetic = energy > 0
+        # Final stuff, update the mammal positions, figure out if we've ended etc
+        # didn't touch dis but you get it.
 
-            # Axis Position
-            current_x_axis_position = competitor_position[0]
-            current_y_axis_position = competitor_position[1]
+        # set_updated_competitor_position()
+        competitor_position = pos()
 
-            # Movement Directions
-            is_moving_forward = movement_action == 'Forward'
-            is_moving_up = movement_action == 'Lane up'
+        # check_if_ended()
+        competitor_a_end = True
+        competitor_b_end = True
 
-            # Movement Functions
-            energetic_function = competitor_a_energetic if is_competitor_a else competitor_b_energetic
-            exhausted_function = competitor_a_exhausted if is_competitor_a else competitor_b_exhausted
-
-            move = energetic_function if is_energetic else exhausted_function
-
-            # Boundaries
-            has_hit_outer_x_boundary = current_x_axis_position < 640
-            has_hit_upper_y_boundary = current_y_axis_position < 240
-            has_hit_lower_y_boundary = current_y_axis_position <- 240
-
-            if is_moving_forward:
-                # handle_move_forward()
-                next_cell_position = current_x_axis_pos if has_hit_outer_boundary else current_x_axis_pos + cell_Size
-
-                move(next_cell_position, current_y_pos)
-
-            elif is_moving_up:
-                # handle_move_up()
-                next_cell_position = current_y_axis_position if has_hit_upper_y_boundary else current_y_axis_position + cell_Size
-
-                move(current_x_axis_position, next_cell_position)
-
-            else:
-                if has_hit_lower_y_boundary:
-                    move(current_x_axis_position, competitor_a_pos[1] - cell_Size) # down
-                else:
-                    move(current_x_axis_position, current_y_axis_position)
-
-            # set_updated_competitor_position()
-            competitor_position = pos()
-
-            # check_if_ended()
-            competitor_a_end = True
-            competitor_b_end = True
-
-            # decrement_competitor_energy()
-            if is_competitor_a:
-                competitor_a_energy = competitor_a_energy -1
-            else:
-                competitor_b_energy = competitor_b_energy - 1
+        # decrement_competitor_energy()
+        if is_competitor_a:
+            competitor_a_energy = competitor_a_energy -1
+        else:
+            competitor_b_energy = competitor_b_energy - 1
 
     #gold_star()
 
 #--------------------------------------------------------------------#
-
-
 
 #-----Main Program to Run Student's Solution-------------------------#
 #
