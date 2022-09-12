@@ -631,14 +631,14 @@ def visualise_data(steps, labelling):
         step_number = step[0]
         competitor = step[1]
         movement_action = step[2]
-        is_competitor_a = competitor == 'Competitor A'
 
         # Competitor Variables
+        is_competitor_a = competitor == 'Competitor A'
         competitor_position = competitor_a_pos if is_competitor_a else competitor_b_pos
         competitor_energy = competitor_a_energy if is_competitor_a else competitor_b_energy
 
         # Energy
-        is_energetic = energy > 0
+        is_energetic = competitor_energy > 0
 
         # Axis Position
         current_x_axis_position = competitor_position[0]
@@ -646,7 +646,7 @@ def visualise_data(steps, labelling):
 
         # Movement Directions
         is_moving_up = movement_action == 'Lane up'
-        is_moving_forward = movement_action == 'Forward'
+        is_moving_right = movement_action == 'Forward'
         is_moving_down = not is_moving_up and not is_moving_forward
 
         # Movement Functions
@@ -657,11 +657,10 @@ def visualise_data(steps, labelling):
         # Boundaries
         at_top_border = current_y_axis_position >= 240
         at_right_border = current_x_axis_position >= 640
-        at_left_border = current_x_axis_position <- 0
+        at_left_border = current_x_axis_position <- 640
         at_bottom_border = current_y_axis_position <- 240
 
         # Let's make the mammals move
-
         new_x_axis_position = current_x_axis_position
         new_y_axis_position = current_y_axis_position
 
@@ -671,19 +670,19 @@ def visualise_data(steps, labelling):
         one_hop_down = current_y_axis_position - cell_Size
         one_hop_up = current_y_axis_position + cell_Size
 
-        if is_moving_forward:
-            if not at_right_border: new_x_axis_position = one_hop_right
-        elif is_moving_up:
+        if is_moving_up:
             if not at_top_border: new_y_axis_position = one_hop_up
         elif is_moving_down:
-            if is_at_bottom: new_y_axis_position = one_hop_up
-        else:
-            # Mammal be movin left, what were we doing here hahahah
+            if not at_bottom_border: new_y_axis_position = one_hop_down
+        elif is_moving_right:
+            if not at_right_border: new_x_axis_position = one_hop_right
+        else: # is_moving_left
+            if not at_left_border: new_x_axis_position = one_hop_left
 
         move(new_x_axis_position, new_y_axis_position)
 
         # Final stuff, update the mammal positions, figure out if we've ended etc
-        # didn't touch dis but you get it.
+        # didn't touch this but you can sort it.
 
         # set_updated_competitor_position()
         competitor_position = pos()
