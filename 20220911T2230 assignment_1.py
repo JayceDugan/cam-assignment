@@ -579,7 +579,6 @@ def write_text():
 # All of your code goes in, or is called from, this function
 # rename_me = steps, and_me_too = labelling
 
-
 def visualise_data(steps, labelling):
     # leave arguments, only calling four functions
 
@@ -609,119 +608,85 @@ def visualise_data(steps, labelling):
     competitor_b_end = False
     competitor_a_end = False
     
-
-        # CHARACTER STARTING POSITION
+    # CHARACTER STARTING POSITION
     competitor_a_pos = [8 * -cell_Size, cell_Size] # changed to list
     competitor_b_pos = [8 * -cell_Size, 2* -cell_Size]
-
 
     # draw where; [0] = x, [1] = y
     competitor_a_energetic(competitor_a_pos[0], competitor_a_pos[1])
     competitor_b_energetic(competitor_b_pos[0], competitor_b_pos[1])
     
-
     ### FIRST LIST [[0, 15, 10] ...]
     for step in steps:
-
         if step[0] == 0: # refs 0 (step-1)
             competitor_a_energy = step[1] # refs 15 (step-2)
             competitor_b_energy = step[2] # refs 10 (step-3)
             
         ### SECOND LIST [step, competitor, movement]
         else:
-            # COMPETITOR A
-            if step[1] == 'Competitor A':
-                
-                # IF ENERGETIC (A)
-                if competitor_a_energy > 0: # energetic
+            step_number = step[0]
+            competitor = step[1]
+            movement_action = step[2]
 
-                    if step[2] == 'Forward':
-                        if competitor_a_pos[0] < 640: # boundary control # 640
-                            competitor_a_energetic(competitor_a_pos[0] + cell_Size, competitor_a_pos[1]) #forward
-                        else:
-                            competitor_a_energetic(competitor_a_pos[0], competitor_a_pos[1])
+            is_competitor_a = competitor == 'Competitor A'
+            competitor_position = competitor_a_pos if is_competitor_a else competitor_b_pos
 
-                    # if y_cord is less than border move up, else don't move
-                    elif step[2] == 'Lane up':
-                        print("listening")
-                        if competitor_a_pos[1] <240: # boundary control
-                            competitor_a_energetic(competitor_a_pos[0], competitor_a_pos[1] + cell_Size) #up
-                        else:
-                            competitor_a_energetic(competitor_a_pos[0], competitor_a_pos[1])
-                    
-                    else:
-                        if competitor_a_pos[1] <-240: # boundary control
-                            competitor_a_energetic(competitor_a_pos[0], competitor_a_pos[1] - cell_Size) # down
-                        else:
-                            competitor_a_energetic(competitor_a_pos[0], competitor_a_pos[1])
-                        
-                        
-                    #write(competitor_a_energy)
+            # Energy
+            energy = competitor_a_energy if is_competitor_a else competitor_b_energy
+            is_energetic = energy > 0
 
-                    competitor_a_pos = pos() # takes current position
-    
-                # IF EXHAUSTED (A)
-                else:
-                    if competitor_a_end == False:
-                        
-                        if step[2] == 'Forward':
-                            competitor_a_exhausted(competitor_a_pos[0] + cell_Size, competitor_a_pos[1])
-                        elif step[2] == 'Lane up':
-                            competitor_a_exhausted(competitor_a_pos[0] + cell_Size, competitor_a_pos[1] + cell_Size)
-                        else:
-                            competitor_a_exhausted(competitor_a_pos[0] + cell_Size, competitor_a_pos[1] - cell_Size) # Down
+            # Axis Position
+            current_x_axis_position = competitor_position[0]
+            current_y_axis_position = competitor_position[1]
 
-                        competitor_a_pos = pos()
-                    competitor_a_end = True
-                    
-                competitor_a_energy = competitor_a_energy -1 # rm energy used
+            # Movement Directions
+            is_moving_forward = movement_action == 'Forward'
+            is_moving_up = movement_action == 'Lane up'
 
-            # COMPETITOR B
+            # Movement Functions
+            energetic_function = competitor_a_energetic if is_competitor_a else competitor_b_energetic
+            exhausted_function = competitor_a_exhausted if is_competitor_a else competitor_b_exhausted
+
+            move = energetic_function if is_energetic else exhausted_function
+
+            # Boundaries
+            has_hit_outer_x_boundary = current_x_axis_position < 640
+            has_hit_upper_y_boundary = current_y_axis_position < 240
+            has_hit_lower_y_boundary = current_y_axis_position <- 240
+
+            if is_moving_forward:
+                # handle_move_forward()
+                next_cell_position = current_x_axis_pos if has_hit_outer_boundary else current_x_axis_pos + cell_Size
+
+                move(next_cell_position, current_y_pos)
+
+            elif is_moving_up:
+                # handle_move_up()
+                next_cell_position = current_y_axis_position if has_hit_upper_y_boundary else current_y_axis_position + cell_Size
+
+                move(current_x_axis_position, next_cell_position)
+
             else:
-
-                # IF ENERGETIC (B)
-                if competitor_b_energy > 0: # energetic
-
-                    if step[2] == 'Forward':
-                        if competitor_b_pos[0] <640: # boundary control
-                            competitor_b_energetic(competitor_b_pos[0] + cell_Size, competitor_b_pos[1]) # forward
-                        else:
-                            competitor_b_energetic(competitor_b_pos[0], competitor_b_pos[1])
-
-                    elif step[2] == 'Lane up':
-                        if competitor_b_pos[1] <240: # boundary control
-                            competitor_b_energetic(competitor_b_pos[0], competitor_b_pos[1] + cell_Size) # up
-                        else:
-                            competitor_b_energetic(competitor_b_pos[0], competitor_b_pos[1])
-                            
-                    else:
-                        if competitor_b_pos[1] < -240: # boundary control
-                            competitor_b_energetic(competitor_b_pos[0] + cell_Size, competitor_b_pos[1] - cell_Size) # down
-                        else:
-                            competitor_b_energetic(competitor_b_pos[0] + cell_Size, competitor_b_pos[1])
-                            
-                    competitor_b_pos = pos()
-
-                # IF EXHAUSTED (B)
+                if has_hit_lower_y_boundary:
+                    move(current_x_axis_position, competitor_a_pos[1] - cell_Size) # down
                 else:
-                    if competitor_b_end == False:
-                    
-                        if step[2] == 'Forward':
-                            competitor_b_exhausted(competitor_b_pos[0] + cell_Size, competitor_b_pos[1])
-                        elif step[2] == 'Lane up':
-                            competitor_b_exhausted(competitor_b_pos[0] + cell_Size, competitor_b_pos[1] + cell_Size)
-                        else:
-                            competitor_b_exhausted(competitor_b_pos[0] + cell_Size, competitor_b_pos[1] - cell_Size) # Down
+                    move(current_x_axis_position, current_y_axis_position)
 
-                        competitor_b_pos = pos()
-                    competitor_b_end = True
+            # set_updated_competitor_position()
+            competitor_position = pos()
 
-                competitor_b_energy = competitor_b_energy -1 # rm energy used
+            # check_if_ended()
+            competitor_a_end = True
+            competitor_b_end = True
 
+            # decrement_competitor_energy()
+            if is_competitor_a:
+                competitor_a_energy = competitor_a_energy -1
+            else:
+                competitor_b_energy = competitor_b_energy - 1
 
     #gold_star()
 
-            
 #--------------------------------------------------------------------#
 
 
